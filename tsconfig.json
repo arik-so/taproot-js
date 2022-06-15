@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"module": "ES2020",
+		"moduleResolution": "Node",
+		"target": "es2021",
+		"sourceMap": true,
+		"esModuleInterop": false,
+		"allowSyntheticDefaultImports": true,
+		"rootDir": "src"
+	},
+	"compileOnSave": true,
+	"exclude": [
+		"node_modules"
+	]
+}

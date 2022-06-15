@@ -1,0 +1,32 @@
+{
+  "name": "taproot",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "./node_modules/typescript/bin/tsc --build tsconfig.json"
+  },
+  "type": "module",
+  "engines": {
+    "node": "16.11.0",
+    "npm": "8.0.0"
+  },
+  "dependencies": {
+    "bip32": "~3.0.1",
+    "bitcoinjs-lib": "~6.0.1",
+    "debug": "~4.3.2",
+    "ecpair": "~2.0.1",
+    "tiny-secp256k1": "~2.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "~4.3.1",
+    "@types/mocha": "~9.1.1",
+    "@types/node": "~16.10.3",
+    "chai": "~4.3.6",
+    "mocha": "~10.0.0",
+    "typescript": "~4.7.3"
+  },
+  "author": "Arik Sosman",
+  "license": "MIT"
+}
