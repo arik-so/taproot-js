@@ -18,7 +18,7 @@ describe('Transaction Tests', () => {
         console.dir(taprootOutput);
 
         const tx = new bitcoin.Transaction();
-        const [txid, vout] = '37f2c63247cbcd89b882230ab80b4f0ad3cd9168990fa05a64c06fdc0f2017dd:0'.split(':');
+        const [txid, vout] = '991ab2b13f6bc6c13002d79d5e9775626a5e7328e14cd16837d50d1cc637dc6a:0'.split(':');
         tx.version = 2;
         tx.addInput(Buffer.from(txid, 'hex').reverse(), parseInt(vout));
         tx.addOutput(taprootOutput.scriptPubKey, 49.99995e8);
@@ -28,6 +28,7 @@ describe('Transaction Tests', () => {
             [50e8], // All previous values of all inputs
             bitcoin.Transaction.SIGHASH_DEFAULT // sighash flag, DEFAULT is schnorr-only (DEFAULT == ALL)
         );
+        console.log('sighash:', sighash.toString('hex'));
         const signature = Buffer.from(ecc.signSchnorr(sighash, taprootOutput.tweakedPrivateKey, Buffer.alloc(32)));
         tx.ins[0].witness = [signature];
         const txHex = tx.toHex();
@@ -35,7 +36,7 @@ describe('Transaction Tests', () => {
     });
 
     it('should create test vector branch and pubkey', () => {
-        // address: bcrt1pyyvzurexyeadnnqp04dtv6yu6a4ee0ymjzxe2caynvu437xv5kxs65fqpm
+        // address: bcrt1punvppl2stp38f7kwv2u2spltjuvuaayuqsthe34hd2dyy5w4g58q6cq58p
         const tapLeafA = new TapLeaf(0, Buffer.from('20b617298552a72ade070667e86ca63b8f5789a9fe8731ef91202a91c9f3459007ac', 'hex'));
         const tapTree = new TapBranch(tapLeafA);
 
@@ -43,6 +44,7 @@ describe('Transaction Tests', () => {
         const output = Taproot.calculateOutput(untweakedKey, tapTree);
         const control0 = tapTree.calculateControlBlock(output.parityBit, untweakedKey, 0);
 
+        chai.assert(output.address === 'bcrt1punvppl2stp38f7kwv2u2spltjuvuaayuqsthe34hd2dyy5w4g58q6cq58p');
         chai.assert(output.scriptPubKey.toString('hex') === '5120e4d810fd50586274face62b8a807eb9719cef49c04177cc6b76a9a4251d5450e');
         chai.assert(control0.toString('hex') === 'c093478e9488f956df2396be2ce6c5cced75f900dfa18e7dabd2428aae78451820');
 
@@ -62,7 +64,8 @@ describe('Transaction Tests', () => {
         const control0 = tapTree.calculateControlBlock(output.parityBit, untweakedKey, 0);
         const control1 = tapTree.calculateControlBlock(output.parityBit, untweakedKey, 1);
         const control2 = tapTree.calculateControlBlock(output.parityBit, untweakedKey, 2);
-        
+
+        chai.assert(output.address === 'bcrt1pw5tf7sqp4f50zka7629jrr036znzew70zxyvvej3zrpf8jg8hqcs24qspv');
         chai.assert(output.scriptPubKey.toString('hex') === '512075169f4001aa68f15bbed28b218df1d0a62cbbcf1188c6665110c293c907b831');
         chai.assert(control0.toString('hex') === 'c155adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d3cd369a528b326bc9d2133cbd2ac21451acb31681a410434672c8e34fe757e91');
         chai.assert(control1.toString('hex') === 'c155adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312dd7485025fceb78b9ed667db36ed8b8dc7b1f0b307ac167fa516fe4352b9f4ef7f154e8e8e17c31d3462d7132589ed29353c6fafdb884c5a6e04ea938834f0d9d');
@@ -82,6 +85,7 @@ describe('Transaction Tests', () => {
         console.log('hash:', hashReference.toString('hex'));
         
         const tapScript = bitcoin.script.fromASM('OP_DUP OP_HASH160 da3ae579ab6e7dbbf607b3096e32b0f15fb33a33 OP_EQUALVERIFY');
+        console.log('tapcsript:', tapScript.toString('hex'));
         const tapLeaf = new TapLeaf(0, tapScript);
         const tapTree = new TapBranch(tapLeaf);
 
