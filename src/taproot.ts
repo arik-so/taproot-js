@@ -27,7 +27,7 @@ export class Taproot {
         // empty bytes without a tap tree
         let merkleRoot = Buffer.alloc(0);
         if (tapTree) {
-            merkleRoot = tapTree.calculateMerkleRoot(true);
+            merkleRoot = tapTree.calculateMerkleRoot();
         }
         debug('Tap tree hash: %s', merkleRoot.toString('hex'));
         const tweakDelta = bitcoin.crypto.taggedHash('TapTweak', Buffer.concat([internalPubkey, merkleRoot]));
@@ -111,7 +111,7 @@ export class TapBranch {
         this.leafB = leafB;
     }
     
-    calculateMerkleRoot(isTreeRoot  = false): Buffer {
+    calculateMerkleRoot(): Buffer {
         let leftHash = Buffer.alloc(0);
         let rightHash = Buffer.alloc(0);
         
@@ -132,7 +132,7 @@ export class TapBranch {
         const sortedPreimage = sortedHashes
         .reduce((p, c) => Buffer.concat([p, c]), Buffer.alloc(0));
         
-        if (isTreeRoot && sortedPreimage.length === 32){
+        if (sortedPreimage.length === 32){
             return sortedPreimage;
         }
         
