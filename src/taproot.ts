@@ -20,8 +20,8 @@ export class Taproot {
     public static calculateOutput(untweakedKey: ECPairInterface, tapTree: TapBranch = null): {address: string, scriptPubKey: Buffer, parityBit: number, tweakedPrivateKey?: Buffer} {
         const untweakedPubkey = untweakedKey.publicKey;
         // even y -> 0, odd y; -> 1
-        const parityBit = untweakedPubkey[0] === 2 ? 0 : 1;
-        debug("Untweaked pubkey parity: %d, hex: %s", parityBit, untweakedPubkey.toString('hex'));
+        const untweakedParityBit = untweakedPubkey[0] === 2 ? 0 : 1;
+        debug("Untweaked pubkey parity: %d, hex: %s", untweakedParityBit, untweakedPubkey.toString('hex'));
         const internalPubkey = untweakedPubkey.slice(1, 33);
         debug("Internal (parity-stripped) pubkey: %s", internalPubkey.toString('hex'));
         // empty bytes without a tap tree
@@ -42,16 +42,16 @@ export class Taproot {
             const N_LESS_1 = Buffer.from('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140', 'hex');
             // 1 represented as 32 bytes BE
             const ONE = Buffer.from('0000000000000000000000000000000000000000000000000000000000000001', 'hex');
-            const privateKey = untweakedPubkey[0] === 2 ? untweakedPrivateKey : ecc.privateAdd(ecc.privateSub(N_LESS_1, untweakedPrivateKey), ONE);
+            const privateKey = (untweakedParityBit === 0) ? untweakedPrivateKey : ecc.privateAdd(ecc.privateSub(N_LESS_1, untweakedPrivateKey), ONE);
             tweakedPrivateKey = Buffer.from(ecc.privateAdd(privateKey, tweakDelta));
         }
 
         if (tweakResult === null) {
             throw new Error('Invalid Tweak');
         }
-        const { xOnlyPubkey: tweakedPubkey } = tweakResult;
+        const { parity: parityBit, xOnlyPubkey: tweakedPubkey } = tweakResult;
         // @ts-ignore
-        debug("Tweaked pubkey: %s", Buffer.from(tweakedPubkey).toString('hex'));
+        debug("Tweaked pubkey parity: %d, hex: %s", parityBit, Buffer.from(tweakedPubkey).toString('hex'));
         
         // scriptPubkey
         const scriptPubKey = Buffer.concat([
